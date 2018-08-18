@@ -28,7 +28,7 @@ png: $(patsubst %.scad, $(img)/%.png, $(wildcard *.scad))
 gcode: $(patsubst %.scad, $(GCODE)/%.gcode, $(wildcard *.scad))
 
 clean:
-	rm -f $(DEPS)/* $(STL)/* $(GCODE)/*
+	rm -f *.stl *.gcode *.png $(DEPS)/* $(STL)/* $(GCODE)/*
 
 $(STL)/%.stl: %.scad
 	mkdir -p $(STL)
