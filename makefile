@@ -6,6 +6,7 @@ STL=stl
 IMG=img
 GCODE=gcode
 DEPS=build
+REPO=`pwd`
 
 # executables
 OPENSCAD=openscad-nightly
@@ -60,6 +61,12 @@ $(GCODE)/%.gcode: $(STL)/%.stl
 	@echo $@: $<
 	mkdir -p $(GCODE)
 	$(SLICER) --no-gui --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) --print-center $(CENTER) "$(shell cat ${@:$(GCODE)/%.gcode=%.slice})" -o $(GCODE)/ $< || $(SLICER) --gui --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) "$(shell cat ${@:$(GCODE)/%.gcode=%.slice})" -o $(GCODE)/ $< &
+
+$(PWD)/lib/%:
+	./submodules.sh lib/$<
+
+lib/%:
+	./submodules.sh lib/$<
 
 %.stl: $(STL)/%.stl
 	@#
