@@ -40,6 +40,7 @@ $(STL)/%.stl: %.scad
 	-D MAT=\"`cat ${@:$(STL)/%.stl=%.mat} || \
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
+	-D FILE=\"$@\" \
 	-d $(DEPS)/`basename $@`.deps $<
 	$(MAKE) -f $(THIS_FILE) $(IMG)/`basename $@ .stl`.png &
 
@@ -49,12 +50,14 @@ $(IMG)/%.png: %.scad
 	-D MAT=\"`cat ${@:$(IMG)/%.png=%.mat} || \
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
+	-D FILE=\"$@\" \
 	--imgsize=2048,2048 --render \
 	-d $(DEPS)/`basename $@`.deps $< &
 	$(OPENSCAD) -m make -o $(@:.png=-`date '+%y-%m-%d-%H-%M-%S'-preview`.png) \
 	-D MAT=\"`cat ${@:$(IMG)/%.png=%.mat} || \
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
+	-D FILE=\"$@\" \
 	--imgsize=2048,2048 -d $(DEPS)/`basename $@`.deps $< &
 
 $(GCODE)/%.gcode: $(STL)/%.stl
