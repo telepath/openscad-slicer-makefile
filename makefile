@@ -1,5 +1,4 @@
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-# explicit wildcard expansion suppresses errors when no files are found
 
 # directories
 STL=stl
@@ -13,6 +12,7 @@ OPENSCAD=openscad-nightly
 SLICER=slicer
 CENTER=125x105
 
+# explicit wildcard expansion suppresses errors when no files are found
 include $(wildcard $(DEPS)/*.deps)
 
 # config
@@ -42,18 +42,19 @@ $(STL)/%.stl: %.scad
 	-D VER=\"$(VER)\" \
 	-D FILE=\"$@\" \
 	-d $(DEPS)/`basename $@`.deps $<
+	sleep 3
 	$(MAKE) -f $(THIS_FILE) $(IMG)/`basename $@ .stl`.png &
 
 $(IMG)/%.png: %.scad
 	mkdir -p $(IMG)
-	$(OPENSCAD) -m make -o $(@:.png=-`date '+%y-%m-%d-%H-%M-%S'`.png) \
+	$(OPENSCAD) -m make -o $(@:.png=-$(VER).png) \
 	-D MAT=\"`cat ${@:$(IMG)/%.png=%.mat} || \
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
 	-D FILE=\"$@\" \
 	--imgsize=2048,2048 --render \
 	-d $(DEPS)/`basename $@`.deps $< &
-	$(OPENSCAD) -m make -o $(@:.png=-`date '+%y-%m-%d-%H-%M-%S'-preview`.png) \
+	$(OPENSCAD) -m make -o $(@:.png=-$(VER)-preview.png) \
 	-D MAT=\"`cat ${@:$(IMG)/%.png=%.mat} || \
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
