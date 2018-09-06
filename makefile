@@ -33,7 +33,11 @@ gcode: $(patsubst %.scad, $(GCODE)/%.gcode, $(wildcard *.scad))
 clean:
 	rm -f *.stl *.gcode *.png $(DEPS)/* $(STL)/* $(GCODE)/*
 
+$(abspath .)/%: %
+	@echo $@: $<
+
 $(STL)/%.stl: %.scad
+	@echo $@: $<
 	mkdir -p $(STL)
 	mkdir -p $(DEPS)
 	$(OPENSCAD) -m make -o $@ \
@@ -46,6 +50,7 @@ $(STL)/%.stl: %.scad
 	$(MAKE) -f $(THIS_FILE) $(IMG)/`basename $@ .stl`.png &
 
 $(IMG)/%.png: %.scad
+	@echo $@: $<
 	mkdir -p $(IMG)
 	$(OPENSCAD) -m make -o $(@:.png=-$(VER).png) \
 	-D MAT=\"`cat ${@:$(IMG)/%.png=%.mat} || \
@@ -66,20 +71,17 @@ $(GCODE)/%.gcode: $(STL)/%.stl
 	mkdir -p $(GCODE)
 	$(SLICER) --no-gui --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) --print-center $(CENTER) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ $< || $(SLICER) --gui --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ $< &
 
-$(PWD)/lib/%:
-	./submodules.sh lib/$<
-
 lib/%:
-	./submodules.sh lib/$<
+	./submodules.sh lib/$(dir $<)
 
 %.stl: $(STL)/%.stl
-	@#
+	@echo $@: $<
 
 %.scad: $(STL)/%.stl
-	@#
+	@echo $@: $<
 
 %.gcode: $(GCODE)/%.gcode
-	@#
+	@echo $@: $<
 
 %.scad: $(STL)/%.stl
-	@#
+	@echo $@: $<
