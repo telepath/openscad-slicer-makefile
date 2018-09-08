@@ -10,7 +10,6 @@ REPO=`pwd`
 # executables
 OPENSCAD=openscad-nightly
 SLICER=slicer
-CENTER=125x105
 
 # explicit wildcard expansion suppresses errors when no files are found
 include $(wildcard $(DEPS)/*.deps)
@@ -18,6 +17,7 @@ include $(wildcard $(DEPS)/*.deps)
 # config
 DEF_MAT=PET
 SLICER_CONFIG=conf/0.2mm_MAT_MK3.ini
+CENTER=125x105
 VER:=`git log -n 1 --pretty=format:%h .`
 
 .PHONY: all stl gcode png clean %.stl %.png %.gcode
@@ -41,6 +41,7 @@ $(STL)/%.stl: %.scad
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
 	-D FILE=\"$@\" \
+	-D ACTION=\"print\" \
 	-d $(DEPS)/`basename $@`.deps $<
 	sleep 3
 	$(MAKE) -f $(THIS_FILE) $(IMG)/`basename $@ .stl`.png &
@@ -52,6 +53,7 @@ $(IMG)/%.png: %.scad
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
 	-D FILE=\"$@\" \
+	-D ACTION=\"print\" \
 	--imgsize=2048,2048 --render \
 	-d $(DEPS)/`basename $@`.deps $< &
 	$(OPENSCAD) -m make -o $(@:.png=-$(VER)-preview.png) \
