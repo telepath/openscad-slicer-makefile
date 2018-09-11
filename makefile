@@ -6,7 +6,7 @@ IMG=img
 GCODE=gcode
 DEPS=build
 REPO=`pwd`
-
+ 
 # executables
 OPENSCAD=openscad-nightly
 SLICER=slicer
@@ -18,7 +18,8 @@ include $(wildcard $(DEPS)/*.deps)
 DEF_MAT=PET
 SLICER_CONFIG=conf/0.2mm_MAT_MK3.ini
 CENTER=125x105
-VER:=`git log -n 1 --pretty=format:%h .`
+STATUS:=`git diff --no-ext-diff --quiet || echo \*`
+VER:=`git log -n 1 --pretty=format:%h .`$(STATUS)
 
 .PHONY: all stl gcode png clean %.stl %.png %.gcode
 
@@ -44,7 +45,7 @@ $(STL)/%.stl: %.scad
 	-D MAT=\"`cat ${@:$(STL)/%.stl=%.mat} || \
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
-	-D FILE=\"$@\" \
+	-D FILE=\"${@:$(STL)/%=%}\" \
 	-D ACTION=\"print\" \
 	-d $(DEPS)/`basename $@`.deps $<
 	sleep 3
