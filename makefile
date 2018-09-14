@@ -18,8 +18,8 @@ include $(wildcard $(DEPS)/*.deps)
 DEF_MAT=PET
 SLICER_CONFIG=conf/0.2mm_MAT_MK3.ini
 CENTER=125x105
-STATUS:=`git diff --no-ext-diff --quiet || echo \*`
-VER:=`git log -n 1 --pretty=format:%h .`$(STATUS)
+STATUS := $(shell git diff --no-ext-diff --quiet || echo \\\*)
+VER := $(shell git log -n 1 --pretty=format:%h .)$(STATUS)
 
 .PHONY: all stl gcode png clean %.stl %.png %.gcode
 
@@ -60,15 +60,14 @@ $(IMG)/%.png: %.scad
 	-D VER=\"$(VER)\" \
 	-D FILE=\"${@:$(IMG)/%=%}\" \
 	-D ACTION=\"print\" \
-	--imgsize=2048,2048 --render \
-	-d $(DEPS)/`basename $@`.deps $< &
+	--imgsize=2048,2048 --render $< &
 	$(OPENSCAD) -m make -o $(@:.png=-$(VER)-preview.png) \
 	-D MAT=\"`cat ${@:$(IMG)/%.png=%.mat} || \
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
 	-D FILE=\"${@:$(IMG)/%=%}\" \
-	-D ACTION=\"print\" \
-	--imgsize=2048,2048 -d $(DEPS)/`basename $@`.deps $< &
+	-D ACTION=\"render\" \
+	--imgsize=2048,2048 $< &
 
 $(GCODE)/%.gcode: $(STL)/%.stl
 	@echo $@: $<
