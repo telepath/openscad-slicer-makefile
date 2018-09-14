@@ -6,7 +6,7 @@ IMG=img
 GCODE=gcode
 DEPS=build
 REPO=`pwd`
- 
+
 # executables
 OPENSCAD=openscad-nightly
 SLICER=slicer
@@ -58,7 +58,7 @@ $(IMG)/%.png: %.scad
 	-D MAT=\"`cat ${@:$(IMG)/%.png=%.mat} || \
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
-	-D FILE=\"$@\" \
+	-D FILE=\"${@:$(IMG)/%=%}\" \
 	-D ACTION=\"print\" \
 	--imgsize=2048,2048 --render \
 	-d $(DEPS)/`basename $@`.deps $< &
@@ -66,7 +66,8 @@ $(IMG)/%.png: %.scad
 	-D MAT=\"`cat ${@:$(IMG)/%.png=%.mat} || \
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
-	-D FILE=\"$@\" \
+	-D FILE=\"${@:$(IMG)/%=%}\" \
+	-D ACTION=\"print\" \
 	--imgsize=2048,2048 -d $(DEPS)/`basename $@`.deps $< &
 
 $(GCODE)/%.gcode: $(STL)/%.stl
