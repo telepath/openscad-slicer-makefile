@@ -5,7 +5,6 @@ STL=stl
 IMG=img
 GCODE=gcode
 DEPS=build
-REPO=`pwd`
 
 # executables
 OPENSCAD=openscad-nightly
@@ -22,6 +21,8 @@ STATUS := $(shell git diff --no-ext-diff --quiet || echo \\\*)
 VER := $(shell git log -n 1 --pretty=format:%h .)$(STATUS)
 
 .PHONY: all stl gcode png clean %.stl %.png %.gcode
+
+.PRECIOUS: $(STL)/%.stl
 
 all: gcode
 
@@ -48,8 +49,7 @@ $(STL)/%.stl: %.scad
 	-D FILE=\"${@:$(STL)/%=%}\" \
 	-D ACTION=\"print\" \
 	-d $(DEPS)/`basename $@`.deps $<
-	sleep 3
-	$(MAKE) -f $(THIS_FILE) $(IMG)/`basename $@ .stl`.png &
+	$(MAKE) -f $(THIS_FILE) $(IMG)/`basename $@ .stl`.png
 
 $(IMG)/%.png: %.scad
 	@echo $@: $<
@@ -66,8 +66,7 @@ $(IMG)/%.png: %.scad
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
 	-D FILE=\"${@:$(IMG)/%=%}\" \
-	-D ACTION=\"render\" \
-	--imgsize=2048,2048 $< &
+	--imgsize=2048,2048 --render $< &
 
 $(GCODE)/%.gcode: $(STL)/%.stl
 	@echo $@: $<
