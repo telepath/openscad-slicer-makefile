@@ -66,7 +66,7 @@ $(IMG)/%.png: %.scad
 	echo $(DEF_MAT)`\" \
 	-D VER=\"$(VER)\" \
 	-D FILE=\"${@:$(IMG)/%=%}\" \
-	--imgsize=2048,2048 --render $< &
+	--imgsize=2048,2048 $< &
 
 $(GCODE)/%.gcode: $(STL)/%.stl
 	@echo $@: $<
