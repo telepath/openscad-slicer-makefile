@@ -1,0 +1,64 @@
+THIS_FILE := $(lastword $(MAKEFILE_LIST))
+
+# directories
+STL=stl
+IMG=img
+GCODE=gcode
+DEPS=build
+ASSY=assembly
+
+# executables
+OPENSCAD=openSCAD-nightly
+SLICER=slicer
+FREECAD=freecad
+# FREECAD=~/Downloads/FreeCAD_0.19.16207_Conda_Py3Qt5_glibc2.12-x86_64.AppImage
+FC_MACROS=~/.FreeCAD/Macro
+
+# config
+DEF_MAT=PET
+SLICER_CONFIG=conf/default_MAT.ini
+CENTER=75x75
+STATUS := $(shell git diff --no-ext-diff --quiet || echo \\\*)
+VER := $(shell git log -n 1 --pretty=format:%h .)$(STATUS)
+
+.PHONY: all clean #stl gcode png %.stl %.png %.gcode
+
+.PRECIOUS: $(STL)/%.stl
+
+# all: gcode
+#
+# stl: $(patsubst %.FCStd, $(stl)/%.stl, $(wildcard *.FCStd))
+#
+# gcode: $(patsubst %.FCStd, $(GCODE)/%.gcode, $(wildcard *.FCStd))
+
+clean:
+	rm -f *.stl *.gcode *.png $(DEPS)/* $(STL)/* $(GCODE)/*
+
+$(abspath .)/%: %
+	@echo $@: $<
+
+# %:
+# 	@echo 1 $@: $<
+
+# $(STL)/%.stl: %.FCStd
+# 	@echo 2 $@: $<
+$(STL)/%.stl: $(firstword $(subst -, ,%)).FCStd
+	@echo $@: $(firstword $(subst -, ,$<)).FCStd
+	$(FREECAD) $(firstword $(subst -, ,$<)).FCStd $(FC_MACROS)/Info.FCMacro $(FC_MACROS)/exportProject.FCMacro $(FC_MACROS)/exit.FCMacro
+
+$(GCODE)/%.gcode: $(STL)/%.stl
+	@echo 3 $@: $<
+	mkdir -p $(GCODE)
+	$(SLICER) -g --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) --center $(CENTER) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ $<
+
+lib/%:
+	./submodules.sh lib/$(dir $<)
+
+%.stl: $(STL)/%.stl
+	@echo $@: $<
+
+%.gcode: $(GCODE)/%.gcode
+	@echo $@: $<
+
+%.FCStd: $(STL)/%.stl
+	@echo $@: $<
