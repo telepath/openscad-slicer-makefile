@@ -11,8 +11,7 @@ ASSY=assembly
 OPENSCAD=openSCAD-nightly
 SLICER=slicer
 FREECAD=freecad
-# FREECAD=~/Downloads/FreeCAD_0.19.16207_Conda_Py3Qt5_glibc2.12-x86_64.AppImage
-FC_MACROS=~/.FreeCAD/Macro
+FC_MACROS=~/.FreeCAD/Macro/FreeCAD-macros
 
 # config
 DEF_MAT=PET
