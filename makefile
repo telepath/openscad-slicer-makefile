@@ -86,7 +86,7 @@ $(IMG)/%.png: %.scad
 $(GCODE)/%.gcode: $(STL)/%.stl
 	@echo $@: $<
 	mkdir -p $(GCODE)
-	$(SLICER) --no-gui --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) --print-center $(CENTER) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ $< || $(SLICER) --gui --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ $<
+	$(SLICER) --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) --center $(CENTER) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -g -o $(GCODE)/ $<
 
 lib/%:
 	./submodules.sh lib/$(dir $<)
