@@ -43,7 +43,7 @@ $(abspath .)/%: %
 # 	@echo 2 $@: $<
 $(STL)/%.stl: $(firstword $(subst -, ,%)).FCStd
 	@echo $@: $(firstword $(subst -, ,$<)).FCStd
-	$(FREECAD) $(firstword $(subst -, ,$<)).FCStd $(FC_MACROS)/Info.FCMacro $(FC_MACROS)/exportProject.FCMacro $(FC_MACROS)/exit.FCMacro
+	$(FREECAD) $(firstword $(subst -, ,$<)).FCStd $(FC_MACROS)/partInfo.FCMacro $(FC_MACROS)/exportProject.FCMacro $(FC_MACROS)/exit.FCMacro
 
 $(GCODE)/%.gcode: $(STL)/%.stl
 	@echo 3 $@: $<
