@@ -10,14 +10,14 @@ ASSY=assembly
 
 # executables
 OPENSCAD=openSCAD-nightly
-SLICER=slicer
+SLICER=prusa-slicer
 FREECAD=freecad
 FC_MACROS=~/.FreeCAD/Macro/FreeCAD-macros
 # FC_MACROS=/run/user/1000/doc/babcc839/FreeCAD-macros/FreeCAD-macros
 
 # config
 DEF_MAT=PET
-SLICER_CONFIG=conf/default_MAT.ini
+SLICER_CONFIG=conf/0.2mm_MAT_MINI.ini
 CENTER=75x75
 STATUS := $(shell git diff --no-ext-diff --quiet || echo \\\*)
 VER := $(shell git log -n 1 --pretty=format:%h .)$(STATUS)
@@ -54,7 +54,7 @@ $(GIF)/%.gif: $(firstword $(subst -, ,%)).FCStd
 $(GCODE)/%.gcode: $(STL)/%.stl
 	@echo 3 $@: $<
 	mkdir -p $(GCODE)
-	$(SLICER) -g --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) --center $(CENTER) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ $<
+	$(SLICER) --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) --center $(CENTER) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ --slice $<
 
 lib/%:
 	./submodules.sh lib/$(dir $<)
