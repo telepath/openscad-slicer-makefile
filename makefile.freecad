@@ -2,7 +2,8 @@ THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
 # directories
 STL=stl
-IMG=img
+IMG=png
+GIF=gif
 GCODE=gcode
 DEPS=build
 ASSY=assembly
@@ -12,6 +13,7 @@ OPENSCAD=openSCAD-nightly
 SLICER=slicer
 FREECAD=freecad
 FC_MACROS=~/.FreeCAD/Macro/FreeCAD-macros
+# FC_MACROS=/run/user/1000/doc/babcc839/FreeCAD-macros/FreeCAD-macros
 
 # config
 DEF_MAT=PET
@@ -44,6 +46,10 @@ $(abspath .)/%: %
 $(STL)/%.stl: $(firstword $(subst -, ,%)).FCStd
 	@echo $@: $(firstword $(subst -, ,$<)).FCStd
 	$(FREECAD) $(firstword $(subst -, ,$<)).FCStd $(FC_MACROS)/partInfo.FCMacro $(FC_MACROS)/exportProject.FCMacro $(FC_MACROS)/exit.FCMacro
+
+$(GIF)/%.gif: $(firstword $(subst -, ,%)).FCStd
+	@echo $@: $(firstword $(subst -, ,$<)).FCStd
+	$(FREECAD) $(firstword $(subst -, ,$<)).FCStd $(FC_MACROS)/exportProject.FCMacro $(FC_MACROS)/exit.FCMacro
 
 $(GCODE)/%.gcode: $(STL)/%.stl
 	@echo 3 $@: $<
