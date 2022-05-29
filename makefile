@@ -8,14 +8,14 @@ DEPS=build
 
 # executables
 OPENSCAD=openscad-nightly
-SLICER=slicer
+SLICER=prusa-slicer
 
 # explicit wildcard expansion suppresses errors when no files are found
 include $(wildcard $(DEPS)/*.deps)
 
 # config
 DEF_MAT=PET
-SLICER_CONFIG=conf/0.2mm_MAT_MK3.ini
+SLICER_CONFIG=conf/0.2mm_MAT_MINI.ini
 CENTER=125x105
 STATUS := $(shell git diff --no-ext-diff --quiet || echo \\\*)
 VER := $(shell git log -n 1 --pretty=format:%h .)$(STATUS)
@@ -60,7 +60,7 @@ $(IMG)/%.png: %.scad
 	-D VER=\"$(VER)\" \
 	-D FILE=\"${@:$(IMG)/%=%}\" \
 	-D ACTION=\"print\" \
-	--imgsize=2048,2048 --render $< &
+	--imgsize=2048,2048 --render 1 $< &
 	$(OPENSCAD) -m make -o $(@:.png=-$(VER)-preview.png) \
 	-D MAT=\"`cat ${@:$(IMG)/%.png=%.mat} || \
 	echo $(DEF_MAT)`\" \
@@ -71,7 +71,7 @@ $(IMG)/%.png: %.scad
 $(GCODE)/%.gcode: $(STL)/%.stl
 	@echo $@: $<
 	mkdir -p $(GCODE)
-	$(SLICER) --no-gui --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) --print-center $(CENTER) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ $< || $(SLICER) --gui --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ $<
+	$(SLICER) --load $(subst MAT,`cat ${@:$(GCODE)/%.gcode=%.mat} || echo $(DEF_MAT)`,$(SLICER_CONFIG)) --center $(CENTER) $(shell cat ${@:$(GCODE)/%.gcode=%.slice}) -o $(GCODE)/ --slice --export-gcode $<
 
 lib/%:
 	./submodules.sh lib/$(dir $<)
