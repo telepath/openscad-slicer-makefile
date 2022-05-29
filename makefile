@@ -5,6 +5,7 @@ STL=stl
 IMG=img
 GCODE=gcode
 DEPS=build
+ASSY=assembly
 
 # executables
 OPENSCAD=openscad-nightly
@@ -28,6 +29,8 @@ all: gcode
 
 stl: $(patsubst %.scad, $(stl)/%.stl, $(wildcard *.scad))
 
+assy: $(patsubst %.scad, $(ASSY)/%.stl, $(wildcard *.scad))
+
 png: $(patsubst %.scad, $(img)/%.png, $(wildcard *.scad))
 
 gcode: $(patsubst %.scad, $(GCODE)/%.gcode, $(wildcard *.scad))
@@ -50,6 +53,18 @@ $(STL)/%.stl: %.scad
 	-D ACTION=\"print\" \
 	-d $(DEPS)/`basename $@`.deps $<
 	$(MAKE) -f $(THIS_FILE) $(IMG)/`basename $@ .stl`.png
+
+$(ASSY)/%.stl: %.scad
+	@echo $@: $<
+	mkdir -p $(ASSY)
+	mkdir -p $(DEPS)
+	$(OPENSCAD) -m make -o $@ \
+	-D MAT=\"`cat ${@:$(ASSY)/%.stl=%.mat} || \
+	echo $(DEF_MAT)`\" \
+	-D VER=\"$(VER)\" \
+	-D FILE=\"${@:$(ASSY)/%=%}\" \
+	-D ACTION=\"assembly\" \
+	-d $(DEPS)/`basename $@`.deps $<
 
 $(IMG)/%.png: %.scad
 	@echo $@: $<
